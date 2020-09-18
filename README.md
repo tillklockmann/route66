@@ -33,7 +33,7 @@ class Repo extends Route66\AbstractRepository
     
 }
 ```
-### 5. template dir
+### 3. template dir
 Create a views folder in the root dir to store the templates. 
 Template files are supposed to have the following naming convention:
 
