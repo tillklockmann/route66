@@ -35,7 +35,7 @@ class App extends RegexBasedAbstract implements DataGenerator
     public function __construct(AbstractController $controller, AbstractRepository $repo, string $view_folder)
     {
         if (empty($view_folder)) {
-            $view_folder = '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'views';
+            $view_folder = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'views';
         }
          $this->request_globals = Request::createFromGlobals();
          $this->uri = $this->request_globals->getPathInfo();
