@@ -1,6 +1,7 @@
 {
     "name": "tillklockmann/route66",
-    "description": "A simple app providing routing, controller, repository and template classes",
+    "description": "A simple mvc app providing routing, controller, repository and template classes",
+    "license": "GNU GPL 3",
     "require": {
         "nikic/fast-route": "^1.3",
         "symfony/http-foundation": "^5.1"
