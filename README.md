@@ -67,7 +67,7 @@ use Route66\App;
 
 $app = new App(Controller::class, new Repo);
 
-$app->get('/', 'index');s
+$app->get('/', 'index');
 $app->get('/about', 'about');
 
 $app->run();
