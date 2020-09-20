@@ -1,74 +1,28 @@
 # route66
-A simple mvc app providing routing, controller, repository and view functionality.
+A simple router.
 ## install with composer
 ```  
-composer require tillklockmann\route66:dev-master
+composer require tillklockmann\route66:1.0
 ``` 
 
 ## usage
 In order to make the app work, you need to have a Repository and a Controller class, that extend the Route66 abstract counterpart. 
-### 1. create Controller class
-```php
-// Controller.php
 
-class Controller extends Route66\AbstractController
-{
-    public function index($request)
-    {
-        $this->view->template('index')->render();
-    }
-
-    public function about($request)
-    {
-        echo 'hello about';
-    }
-}
-
-```
-### 2. create Repository class
-```php
-// Repo.php
-class Repo extends Route66\AbstractRepository
-{
-    
-}
-```
-### 3. template dir
-Create a views folder in the root dir to store the templates. 
-Template files are supposed to have the following naming convention:
-
-**template-name.view.php**
-
-Call the template engine in the controller:
-```php
-// Controller.php
-$this->view->template('index')->render();
-```
-set variables like this
-```php
-// Controller.php
-$myTtle = 'Great Website';
-$this->view->template('index')
-    ->set('title', $myTitle)
-    ->render();
-```
-In the template file
-```php
-// index.view.php
-<h1><?= $title ?></h1>
-```
-### 4. create index.php and setup app
 ```php
 require 'vendor/autoload.php';
-require 'Repo.php';
-require 'Controller.php';
 
-use Route66\App;
+use Route66\Router;
 
-$app = new App(Controller::class, new Repo);
+$container = new Container;
 
-$app->get('/', 'index');
-$app->get('/about', 'about');
+$container['controller'] = function($c) {
+    return new MyOwnController;
+}
+
+$app = new Router($container);
+
+$app->get('/', 'controller@index');
+$app->get('/about', 'controller@about');
 
 $app->run();
 ```

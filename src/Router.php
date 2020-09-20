@@ -8,8 +8,9 @@ use FastRoute\Dispatcher\RegexBasedAbstract;
 use FastRoute\DataGenerator\GroupCountBased as DataGeneratorGroupCountBased;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Psr\Container\ContainerInterface;
 
-class App extends RegexBasedAbstract implements DataGenerator
+class Router extends RegexBasedAbstract implements DataGenerator
 {
     /** @var ParameterBag */
     protected $bag;
@@ -20,31 +21,20 @@ class App extends RegexBasedAbstract implements DataGenerator
     /** @var Std */
     protected $routeParser;
 
-    /** @var View */
-    protected $view;
-
-    /** @var AbstractController */
-    protected $controller;
-
-    /** @var Repo */
-    protected $repo;
-
     /** @var Request */
     protected $request_globals;
 
-    public function __construct(AbstractController $controller, AbstractRepository $repo, string $view_folder)
+    /** @var ContainerInterface */
+    protected $dic;
+
+    public function __construct(ContainerInterface $dic)
     {
-        if (empty($view_folder)) {
-            $view_folder = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'views';
-        }
-         $this->request_globals = Request::createFromGlobals();
-         $this->uri = $this->request_globals->getPathInfo();
-         $this->method = $this->request_globals->server->get('REQUEST_METHOD');
-         $this->dataGenerator = new DataGeneratorGroupCountBased;
-         $this->routeParser =  new Std;
-         $this->controller = new $controller(
-             new $repo, new View($view_folder)
-         );
+        $this->dic = $dic;
+        $this->request_globals = Request::createFromGlobals();
+        $this->uri = $this->request_globals->getPathInfo();
+        $this->method = $this->request_globals->server->get('REQUEST_METHOD');
+        $this->dataGenerator = new DataGeneratorGroupCountBased;
+        $this->routeParser =  new Std;
     }
 
     public function addRoute($httpMethod, $routeData, $handler) { 
@@ -81,13 +71,30 @@ class App extends RegexBasedAbstract implements DataGenerator
                 echo 'Method not allowed.'; 
                 break;
             case FastRoute\Dispatcher::FOUND:
-                $classMethod = $routeInfo[1];
-                $bag = $this->setBag();
-                $bag = $this->setRouteParamsOnBag($routeInfo[2]);
-                // route action
-                $this->controller->{$classMethod}($bag);
+                $this->dispatch($routeInfo);
                 break;
         }
+    }
+
+
+    /**
+     * dispatch registered controller action
+     * @param array $routeInfo 
+     * @return void 
+     * 
+     * @todo throw exception, if controller or action do not exist
+     */
+    protected function dispatch(array $routeInfo)
+    {
+        $handler = explode('@', $routeInfo[1]);
+        $class_dic_id = $handler[0];
+        
+        $controllerClass = $this->dic->get($class_dic_id);
+        $classMethod = $handler[1];
+        $bag = $this->setBag();
+        $bag = $this->setRouteParamsOnBag($routeInfo[2]);
+        // route action
+        $controllerClass->{$classMethod}($bag);
     }
 
     protected function setBag() 
