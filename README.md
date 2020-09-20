@@ -2,7 +2,7 @@
 A simple router.
 ## install with composer
 ```  
-composer require tillklockmann\route66:1.0
+composer require tillklockmann\route66:v1.0.0
 ``` 
 
 ## usage
