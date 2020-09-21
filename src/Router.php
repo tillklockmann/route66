@@ -71,7 +71,7 @@ class Router extends RegexBasedAbstract implements DataGenerator
                 echo 'Method not allowed.'; 
                 break;
             case FastRoute\Dispatcher::FOUND:
-                $this->dispatch($routeInfo);
+                $this->applyController($routeInfo);
                 break;
         }
     }
@@ -84,17 +84,17 @@ class Router extends RegexBasedAbstract implements DataGenerator
      * 
      * @todo throw exception, if controller or action do not exist
      */
-    protected function dispatch(array $routeInfo)
+    protected function applyController(array $routeInfo)
     {
         $handler = explode('@', $routeInfo[1]);
         $class_dic_id = $handler[0];
         
         $controllerClass = $this->dic->get($class_dic_id);
         $classMethod = $handler[1];
-        $bag = $this->setBag();
-        $bag = $this->setRouteParamsOnBag($routeInfo[2]);
+        $this->setBag();
+        $this->setRouteParamsOnBag($routeInfo[2]);
         // route action
-        $controllerClass->{$classMethod}($bag);
+        $controllerClass->{$classMethod}($this->bag);
     }
 
     protected function setBag() 
